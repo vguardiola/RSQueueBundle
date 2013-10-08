@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "ext-redis": ">=2.2.3",
+        "ext-redis": ">=2.2.2",
         "symfony/event-dispatcher": ">=2.2.3",
         "symfony/framework-bundle": ">=2.2.3",
         "doctrine/annotations": "1.0.*@dev",
