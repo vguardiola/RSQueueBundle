@@ -18,6 +18,14 @@ use Mmoreram\RSQueueBundle\Exception\InvalidAliasException;
 class QueueAliasResolver
 {
     /**
+     *
+     */
+    const ERROR_QUEUE_ALIAS = '_error';
+    /**
+     *
+     */
+    const ERROR_QUEUE_NAME = 'queue:_error';
+    /**
      * @var Array
      *
      * Queue names. Key is alias, value is queue real name
@@ -58,7 +66,7 @@ class QueueAliasResolver
      */
     public function getQueues(Array $queueAlias)
     {
-        $queues = array();
+        $queues = [];
         foreach ($queueAlias as $alias) {
 
             $queues[] = $this->getQueue($alias);
@@ -103,8 +111,6 @@ class QueueAliasResolver
 
         return true;
     }
-
-
 
 
     /**
