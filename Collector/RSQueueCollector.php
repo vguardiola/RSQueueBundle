@@ -15,8 +15,6 @@ use Exception;
 
 use Mmoreram\RSQueueBundle\Event\RSQueueProducerEvent;
 use Mmoreram\RSQueueBundle\Event\RSQueuePublisherEvent;
-use Mmoreram\RSQueueBundle\Event\RSQueueConsumerEvent;
-
 
 /**
  * Collector for RSQueue data
@@ -42,7 +40,6 @@ class RSQueueCollector extends DataCollector
         );
     }
 
-
     /**
      * Subscribed to RSQueueProducer event.
      *
@@ -63,7 +60,6 @@ class RSQueueCollector extends DataCollector
 
         return $this;
     }
-
 
     /**
      * Subscribed to RSQueuePublisher event.
@@ -86,7 +82,6 @@ class RSQueueCollector extends DataCollector
         return $this;
     }
 
-
     /**
      * Get total of queue interactions
      *
@@ -96,7 +91,6 @@ class RSQueueCollector extends DataCollector
     {
         return (int) $this->data['total'];
     }
-
 
     /**
      * Get producer collection
@@ -108,7 +102,6 @@ class RSQueueCollector extends DataCollector
         return $this->data['prod'];
     }
 
-
     /**
      * Get publisher collection
      *
@@ -118,7 +111,6 @@ class RSQueueCollector extends DataCollector
     {
         return $this->data['publ'];
     }
-
 
     /**
      * Collects data for the given Request and Response.
@@ -133,7 +125,6 @@ class RSQueueCollector extends DataCollector
     {
 
     }
-
 
     /**
      * Return collector name

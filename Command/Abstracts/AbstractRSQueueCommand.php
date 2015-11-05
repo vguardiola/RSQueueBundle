@@ -9,13 +9,8 @@
 namespace Mmoreram\RSQueueBundle\Command\Abstracts;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Mmoreram\RSQueueBundle\Command\Interfaces\RSQueueCommandInterface;
 use Mmoreram\RSQueueBundle\Exceptions\MethodNotFoundException;
-
 
 /**
  * Abstract rs queue command
@@ -29,7 +24,6 @@ abstract class AbstractRSQueueCommand extends ContainerAwareCommand implements R
      * Array with all configured queues/ with their callable methods
      */
     protected $methods = array();
-
 
     /**
      * Adds a queue/channel to subscribe on
@@ -53,5 +47,19 @@ abstract class AbstractRSQueueCommand extends ContainerAwareCommand implements R
         $this->methods[$alias] = $method;
 
         return $this;
+    }
+
+    /**
+     * Set automatic queue mixing when several queues are defined.
+     *
+     * This method returns if queue order must be shuffled before processing them
+     *
+     * By default is false, so same order will be passed as defined.
+     *
+     * @return boolean Shuffle before passing to Gearman
+     */
+    protected function shuffleQueues()
+    {
+        return false;
     }
 }

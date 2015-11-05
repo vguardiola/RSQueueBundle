@@ -42,6 +42,7 @@ class RedisFactory
         if ($this->config['database']) {
             $redis->select($this->config['database']);
         }
+
         return $redis;
     }
 }

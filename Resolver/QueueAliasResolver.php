@@ -34,14 +34,12 @@ class QueueAliasResolver
      */
     private $queues;
 
-
     /**
      * @var Array
      *
      * Queue aliases. Key is queue real name, value is alias
      */
     private $queueAliases;
-
 
     /**
      * Construct method
@@ -53,7 +51,6 @@ class QueueAliasResolver
         $this->queues = $queues;
         $this->queueAliases = array_flip($queues);
     }
-
 
     /**
      * Given an array of queueAliases, return a valid queueNames array
@@ -75,7 +72,6 @@ class QueueAliasResolver
         return $queues;
     }
 
-
     /**
      * Return real queue name by defined QueueAlias
      *
@@ -91,7 +87,6 @@ class QueueAliasResolver
 
         return $this->queues[$queueAlias];
     }
-
 
     /**
      * Check if given queue alias can be resolved
@@ -111,7 +106,6 @@ class QueueAliasResolver
 
         return true;
     }
-
 
     /**
      * Get alias given queue name

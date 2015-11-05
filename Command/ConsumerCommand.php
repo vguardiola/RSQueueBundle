@@ -17,7 +17,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
 /**
  * Abstract consumer command
  *
@@ -53,7 +52,6 @@ abstract class ConsumerCommand extends AbstractRSQueueCommand
     {
         return $this->addMethod($queueAlias, $queueMethod);
     }
-
 
     /**
      * Configure command
@@ -110,7 +108,6 @@ abstract class ConsumerCommand extends AbstractRSQueueCommand
             );
     }
 
-
     /**
      * Execute code.
      *
@@ -133,9 +130,14 @@ abstract class ConsumerCommand extends AbstractRSQueueCommand
         $sleep = (int) $input->getOption('sleep');
         $gap = (int) $input->getOption('gap');
         $iterationsDone = 0;
-        $queueAliases = array_keys($this->methods);
+        $queuesAlias = array_keys($this->methods);
 
-        while ($response = $consumer->consume($queueAliases, $timeout)) {
+        if ($this->shuffleQueues()) {
+
+            shuffle($queuesAlias);
+        }
+
+        while ($response = $consumer->consume($queuesAlias, $timeout)) {
 
             list($queueAlias, $payload) = $response;
             if (array_key_exists('at_time', $payload) && $payload['at_time'] < time()) {
@@ -169,8 +171,9 @@ abstract class ConsumerCommand extends AbstractRSQueueCommand
                 }
             }
 
-            if (($iterations > 0) && (++$iterationsDone >= $iterations)) {
-                exit;
+            if ( ($iterations > 0) && (++$iterationsDone >= $iterations) ) {
+
+                break;
             }
 
             sleep($sleep);

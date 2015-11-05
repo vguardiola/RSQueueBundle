@@ -8,9 +8,8 @@
 
 namespace Mmoreram\RSQueueBundle\Services\Abstracts;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Redis as RedisClient;
-use Mmoreram\RSQueueBundle\Exception\InvalidQueueNameException;
 use Mmoreram\RSQueueBundle\Serializer\Interfaces\SerializerInterface;
 use Mmoreram\RSQueueBundle\Resolver\QueueAliasResolver;
 
@@ -22,12 +21,11 @@ use Mmoreram\RSQueueBundle\Resolver\QueueAliasResolver;
 class AbstractService
 {
     /**
-     * @EventDispatcher
+     * @var EventDispatcherInterface
      *
      * EventDispatcher instance
      */
     protected $eventDispatcher;
-
 
     /**
      * @var Predis\Client
@@ -36,7 +34,6 @@ class AbstractService
      */
     protected $redis;
 
-
     /**
      * @var QueueAliasResolver
      *
@@ -44,14 +41,12 @@ class AbstractService
      */
     protected $queueAliasResolver;
 
-
     /**
      * @var SerializerInterface
      *
      * Serializer
      */
     protected $serializer;
-
 
     /**
      * @param EventDispatcher     $eventDispatcher    EventDispatcher instance
@@ -61,7 +56,7 @@ class AbstractService
      *
      * Construct method
      */
-    public function __construct(EventDispatcher $eventDispatcher, RedisClient $redis, QueueAliasResolver $queueAliasResolver, SerializerInterface $serializer)
+    public function __construct(EventDispatcherInterface $eventDispatcher, RedisClient $redis, QueueAliasResolver $queueAliasResolver, SerializerInterface $serializer)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->redis = $redis;
