@@ -140,42 +140,46 @@ abstract class ConsumerCommand extends AbstractRSQueueCommand
         while ($response = $consumer->consume($queuesAlias, $timeout)) {
 
             list($queueAlias, $payload) = $response;
-            if (array_key_exists('at_time', $payload) && $payload['at_time'] < time()) {
-                continue;
-            }
-            $method = $this->methods[$queueAlias];
+            if (array_key_exists('atTime', $payload) && $payload['atTime'] > time()) {
+                $producer = $this->getContainer()->get('rs_queue.producer');
+                $producer->produce($queueAlias, $payload);
+                usleep(500000);
+            } else {
+                $method = $this->methods[$queueAlias];
 
-            /**
-             * All custom methods must have these parameters
-             *
-             * InputInterface  $input   An InputInterface instance
-             * OutputInterface $output  An OutputInterface instance
-             * Mixed           $payload Payload
-             */
-            try {
-                $this->$method($input, $output, $payload);
-            } catch (ConsumerException $e) {
-                if ($payload['max_retries'] > 0) {
-                    if (array_key_exists('retries', $payload)) {
-                        $payload['retries']++;
-                    } else {
-                        $payload['retries'] = 1;
-                    }
-                    $producer = $this->getContainer()->get('rs_queue.producer');
-                    if ($payload['retries'] < $payload['max_retries']) {
-                        $payload['at_time'] = time() + $gap;
-                        $producer->produce($queueAlias, $payload);
-                    } else {
-                        $producer->produce(QueueAliasResolver::ERROR_QUEUE_ALIAS, $payload);
+                /**
+                 * All custom methods must have these parameters
+                 *
+                 * InputInterface  $input   An InputInterface instance
+                 * OutputInterface $output  An OutputInterface instance
+                 * Mixed           $payload Payload
+                 */
+                try {
+                    $this->$method($input, $output, $payload);
+                } catch (ConsumerException $e) {
+                    if ($payload['maxRetries'] > 0) {
+                        if (array_key_exists('retries', $payload)) {
+                            $payload['retries']++;
+                        } else {
+                            $payload['retries'] = 1;
+                        }
+                        $producer = $this->getContainer()->get('rs_queue.producer');
+                        if ($payload['retries'] < $payload['maxRetries']) {
+                            echo 'lo re-probaremos';
+                            $payload['atTime'] = time() + $gap;
+                            $producer->produce($queueAlias, $payload);
+                        } else {
+                            $producer->produce(QueueAliasResolver::ERROR_QUEUE_ALIAS, $payload);
+                        }
                     }
                 }
             }
-
-            if ( ($iterations > 0) && (++$iterationsDone >= $iterations) ) {
-
+            if (($iterations > 0) && (++$iterationsDone >= $iterations)) {
                 break;
             }
-
+            if ($this->shuffleQueues()) {
+                shuffle($queuesAlias);
+            }
             sleep($sleep);
         }
     }
