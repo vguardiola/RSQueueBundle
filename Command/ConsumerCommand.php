@@ -166,7 +166,6 @@ abstract class ConsumerCommand extends AbstractRSQueueCommand
                         }
                         $producer = $this->getContainer()->get('rs_queue.producer');
                         if ($payload['retries'] < $payload['maxRetries']) {
-                            echo 'lo re-probaremos';
                             $payload['atTime'] = time() + $gap;
                             $producer->produce($queueAlias, $payload);
                         } else {
