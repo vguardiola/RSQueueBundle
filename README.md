@@ -1,7 +1,3 @@
-> **WARNING !!**  
-> Moving to https://github.com/rsqueue/RSQueueBundle  
-> This package will be abandoned soon  
-
 RSQueueBundle for Symfony
 =====
 ### Simple queuing system based on Redis
