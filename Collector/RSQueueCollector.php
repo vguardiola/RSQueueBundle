@@ -15,27 +15,22 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
- * Collector for RSQueue data
+ * Collector for RSQueue data.
  *
  * All these methods are subscribed to custom RSQueueBundle events
  */
 class RSQueueCollector extends DataCollector
 {
+    private $total;
 
     /**
-     * Construct method for initializate all data
+     * Construct method for initializate all data.
      *
      * Also initializes total value to 0
      */
     public function __construct()
     {
-        $this->total = 0;
-        $this->data = [
-
-            'prod' => [],
-            'publ' => [],
-            'total' => 0,
-        ];
+        $this->reset();
     }
 
     /**
@@ -45,15 +40,14 @@ class RSQueueCollector extends DataCollector
      *
      * @param RSQueueProducerEvent $event Event fired
      *
-     * @return RSQueueCollector
+     * @return RSQueueCollector self Object
      */
     public function onProducerAction(RSQueueProducerEvent $event)
     {
-        $this->data['total']++;
+        ++$this->data['total'];
         $this->data['prod'][] = [
             'payload' => $event->getPayloadSerialized(),
             'queue' => $event->getQueueName(),
-            'alias' => $event->getQueueAlias(),
         ];
 
         return $this;
@@ -66,34 +60,33 @@ class RSQueueCollector extends DataCollector
      *
      * @param RSQueuePublisherEvent $event Event fired
      *
-     * @return RSQueueCollector
+     * @return RSQueueCollector self Object
      */
     public function onPublisherAction(RSQueuePublisherEvent $event)
     {
-        $this->data['total']++;
+        ++$this->data['total'];
         $this->data['publ'][] = [
             'payload' => $event->getPayloadSerialized(),
             'queue' => $event->getChannelName(),
-            'alias' => $event->getChannelAlias(),
         ];
 
         return $this;
     }
 
     /**
-     * Get total of queue interactions
+     * Get total of queue interactions.
      *
-     * @return integer
+     * @return int
      */
     public function getTotal()
     {
-        return (int)$this->data['total'];
+        return (int) $this->data['total'];
     }
 
     /**
-     * Get producer collection
+     * Get producer collection.
      *
-     * @return Array
+     * @return array
      */
     public function getProducer()
     {
@@ -101,9 +94,9 @@ class RSQueueCollector extends DataCollector
     }
 
     /**
-     * Get publisher collection
+     * Get publisher collection.
      *
-     * @return Array
+     * @return array
      */
     public function getPublisher()
     {
@@ -113,19 +106,34 @@ class RSQueueCollector extends DataCollector
     /**
      * Collects data for the given Request and Response.
      *
-     * @param Request    $request A Request instance
-     * @param Response   $response A Response instance
-     * @param \Exception $exception An Exception instance
+     * @param Request    $request
+     * @param Response   $response
+     * @param \Exception $exception
      *
      * @api
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
-    {
-
+    public function collect(
+        Request $request,
+        Response $response,
+        \Exception $exception = null
+    ) {
     }
 
     /**
-     * Return collector name
+     * Reset collector.
+     */
+    public function reset()
+    {
+        $this->total = 0;
+        $this->data = [
+            'prod' => [],
+            'publ' => [],
+            'total' => 0,
+        ];
+    }
+
+    /**
+     * Return collector name.
      *
      * @return string Collector name
      */
