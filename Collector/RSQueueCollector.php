@@ -8,13 +8,11 @@
 
 namespace Mmoreram\RSQueueBundle\Collector;
 
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Exception;
-
 use Mmoreram\RSQueueBundle\Event\RSQueueProducerEvent;
 use Mmoreram\RSQueueBundle\Event\RSQueuePublisherEvent;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
  * Collector for RSQueue data
@@ -32,12 +30,12 @@ class RSQueueCollector extends DataCollector
     public function __construct()
     {
         $this->total = 0;
-        $this->data = array(
+        $this->data = [
 
-            'prod'  =>  array(),
-            'publ'  =>  array(),
-            'total' =>  0,
-        );
+            'prod' => [],
+            'publ' => [],
+            'total' => 0,
+        ];
     }
 
     /**
@@ -47,16 +45,16 @@ class RSQueueCollector extends DataCollector
      *
      * @param RSQueueProducerEvent $event Event fired
      *
-     * @return QueueCollector self Object
+     * @return RSQueueCollector
      */
     public function onProducerAction(RSQueueProducerEvent $event)
     {
         $this->data['total']++;
-        $this->data['prod'][] = array(
-            'payload'   =>  $event->getPayloadSerialized(),
-            'queue'     =>  $event->getQueueName(),
-            'alias'     =>  $event->getQueueAlias(),
-        );
+        $this->data['prod'][] = [
+            'payload' => $event->getPayloadSerialized(),
+            'queue' => $event->getQueueName(),
+            'alias' => $event->getQueueAlias(),
+        ];
 
         return $this;
     }
@@ -68,16 +66,16 @@ class RSQueueCollector extends DataCollector
      *
      * @param RSQueuePublisherEvent $event Event fired
      *
-     * @return QueueCollector self Object
+     * @return RSQueueCollector
      */
     public function onPublisherAction(RSQueuePublisherEvent $event)
     {
         $this->data['total']++;
-        $this->data['publ'][] = array(
-            'payload'   =>  $event->getPayloadSerialized(),
-            'queue'     =>  $event->getChannelName(),
-            'alias'     =>  $event->getChannelAlias(),
-        );
+        $this->data['publ'][] = [
+            'payload' => $event->getPayloadSerialized(),
+            'queue' => $event->getChannelName(),
+            'alias' => $event->getChannelAlias(),
+        ];
 
         return $this;
     }
@@ -89,7 +87,7 @@ class RSQueueCollector extends DataCollector
      */
     public function getTotal()
     {
-        return (int) $this->data['total'];
+        return (int)$this->data['total'];
     }
 
     /**
@@ -115,8 +113,8 @@ class RSQueueCollector extends DataCollector
     /**
      * Collects data for the given Request and Response.
      *
-     * @param Request    $request   A Request instance
-     * @param Response   $response  A Response instance
+     * @param Request    $request A Request instance
+     * @param Response   $response A Response instance
      * @param \Exception $exception An Exception instance
      *
      * @api

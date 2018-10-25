@@ -10,6 +10,7 @@ namespace Mmoreram\RSQueueBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Mmoreram\RSQueueBundle\Serializer\JsonSerializer;
 
 /**
  * This is the class that validates and merges configuration from your app/config files
@@ -33,8 +34,8 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->end()
                 ->end()
                 ->scalarNode('serializer')
-                    ->treatNullLike('Mmoreram\\RSQueueBundle\\Serializer\\JsonSerializer')
-                    ->defaultValue('Mmoreram\\RSQueueBundle\\Serializer\\JsonSerializer')
+                    ->treatNullLike(JsonSerializer::class)
+                    ->defaultValue(JsonSerializer::class)
                 ->end()
                 ->arrayNode('server')
                     ->addDefaultsIfNotSet()

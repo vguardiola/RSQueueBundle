@@ -8,9 +8,9 @@
 
 namespace Mmoreram\RSQueueBundle\Command;
 
+use Mmoreram\RSQueueBundle\Command\Abstracts\AbstractRSQueueCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Mmoreram\RSQueueBundle\Command\Abstracts\AbstractRSQueueCommand;
 
 /**
  * Abstract PSubscriber command
@@ -35,7 +35,7 @@ abstract class PSubscriberCommand extends AbstractRSQueueCommand
      *
      * Checks if channel assigned method exists and is callable
      *
-     * @param String $pattern       Pattern
+     * @param String $pattern Pattern
      * @param String $patternMethod Pattern method
      *
      * @return SubscriberCommand self Object
@@ -50,7 +50,7 @@ abstract class PSubscriberCommand extends AbstractRSQueueCommand
     /**
      * Execute code.
      *
-     * @param InputInterface  $input  An InputInterface instance
+     * @param InputInterface $input An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -71,19 +71,28 @@ abstract class PSubscriberCommand extends AbstractRSQueueCommand
         $this
             ->getContainer()
             ->get('rs_queue.redis')
-            ->psubscribe($patterns, function ($redis, $pattern, $channel, $payloadSerialized) use ($methods, $psubscriberCommand, $serializer, $input, $output) {
+            ->psubscribe(
+                $patterns,
+                function ($redis, $pattern, $channel, $payloadSerialized) use (
+                    $methods,
+                    $psubscriberCommand,
+                    $serializer,
+                    $input,
+                    $output
+                ) {
 
-                $payload = $serializer->revert($payloadSerialized);
-                $method = $methods[$pattern];
+                    $payload = $serializer->revert($payloadSerialized);
+                    $method = $methods[$pattern];
 
-                /**
-                 * All custom methods must have these parameters
-                 *
-                 * InputInterface  $input   An InputInterface instance
-                 * OutputInterface $output  An OutputInterface instance
-                 * Mixed           $payload Payload
-                 */
-                $psubscriberCommand->$method($input, $output, $payload);
-            });
+                    /**
+                     * All custom methods must have these parameters
+                     *
+                     * InputInterface  $input   An InputInterface instance
+                     * OutputInterface $output  An OutputInterface instance
+                     * Mixed           $payload Payload
+                     */
+                    $psubscriberCommand->$method($input, $output, $payload);
+                }
+            );
     }
 }

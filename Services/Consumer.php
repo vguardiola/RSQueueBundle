@@ -8,9 +8,9 @@
 
 namespace Mmoreram\RSQueueBundle\Services;
 
-use Mmoreram\RSQueueBundle\Services\Abstracts\AbstractService;
-use Mmoreram\RSQueueBundle\RSQueueEvents;
 use Mmoreram\RSQueueBundle\Event\RSQueueConsumerEvent;
+use Mmoreram\RSQueueBundle\RSQueueEvents;
+use Mmoreram\RSQueueBundle\Services\Abstracts\AbstractService;
 
 /**
  * Consumer class
@@ -29,7 +29,7 @@ class Consumer extends AbstractService
      * Also, new Consumer event is triggered everytime a new element is popped
      *
      * @param Mixed   $queueAlias Alias of queue to consume from ( Can be an array of alias )
-     * @param Integer $timeout    Timeout. By default, 0
+     * @param Integer $timeout Timeout. By default, 0
      *
      * @return Mixed payload unserialized
      *
@@ -37,14 +37,14 @@ class Consumer extends AbstractService
      */
     public function consume($queueAlias, $timeout = 0)
     {
-        $queues = is_array($queueAlias)
-                ? $this->queueAliasResolver->getQueues($queueAlias)
-                : $this->queueAliasResolver->getQueue($queueAlias);
+        $queues = \is_array($queueAlias)
+            ? $this->queueAliasResolver->getQueues($queueAlias)
+            : $this->queueAliasResolver->getQueue($queueAlias);
 
         $payloadArray = $this->redis->blpop($queues, $timeout);
 
         if (empty($payloadArray)) {
-            return array();
+            return [];
         }
 
         list($givenQueue, $payloadSerialized) = $payloadArray;
@@ -54,9 +54,15 @@ class Consumer extends AbstractService
         /**
          * Dispatching consumer event...
          */
-        $consumerEvent = new RSQueueConsumerEvent($payload, $payloadSerialized, $givenQueueAlias, $givenQueue, $this->redis);
+        $consumerEvent = new RSQueueConsumerEvent(
+            $payload,
+            $payloadSerialized,
+            $givenQueueAlias,
+            $givenQueue,
+            $this->redis
+        );
         $this->eventDispatcher->dispatch(RSQueueEvents::RSQUEUE_CONSUMER, $consumerEvent);
 
-        return array($givenQueueAlias, $payload);
+        return [$givenQueueAlias, $payload];
     }
 }

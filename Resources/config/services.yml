@@ -7,33 +7,33 @@ parameters:
 services:
 
     rs_queue.serializer.factory:
-        class: %rs_queue.serializer.factory.class%
+        class: '%rs_queue.serializer.factory.class%'
         arguments:
-            serializerClass: %rs_queue.serializer.class%
+            - '%rs_queue.serializer.class%'
 
     rs_queue.serializer:
-        class: %rs_queue.serializer.interface%
+        class: '%rs_queue.serializer.interface%'
 
     rs_queue.redis.factory:
-        class: %rs_queue.redis.factory.class%
+        class: '%rs_queue.redis.factory.class%'
         arguments:
-          redis: %rs_queue.server.redis%
+            - '%rs_queue.server.redis%'
 
     rs_queue.redis:
         class: Redis
 
     rs_queue.resolver.queuealias:
-        class: %rs_queue.resolver.queuealias.class%
+        class: '%rs_queue.resolver.queuealias.class%'
         arguments:
-            queueAliases: %rs_queue.queues%
+            queueAliases: '%rs_queue.queues%'
 
     rs_queue.service:
         abstract: true
         arguments:
-            eventDispatcher: "@event_dispatcher"
-            redis: "@rs_queue.redis"
-            queueNamesResolver: "@rs_queue.resolver.queuealias"
-            serializer: "@rs_queue.serializer"
+            - "@event_dispatcher"
+            - "@rs_queue.redis"
+            - "@rs_queue.resolver.queuealias"
+            - "@rs_queue.serializer"
 
     rs_queue.consumer:
         class: Mmoreram\RSQueueBundle\Services\Consumer

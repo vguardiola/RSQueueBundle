@@ -8,11 +8,11 @@
 
 namespace Mmoreram\RSQueueBundle\Command;
 
+use Mmoreram\RSQueueBundle\Command\Abstracts\AbstractRSQueueCommand;
+use Mmoreram\RSQueueBundle\Event\RSQueueSubscriberEvent;
+use Mmoreram\RSQueueBundle\RSQueueEvents;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Mmoreram\RSQueueBundle\Event\RSQueueSubscriberEvent;
-use Mmoreram\RSQueueBundle\Command\Abstracts\AbstractRSQueueCommand;
-use Mmoreram\RSQueueBundle\RSQueueEvents;
 
 /**
  * Abstract Subscriber command
@@ -37,7 +37,7 @@ abstract class SubscriberCommand extends AbstractRSQueueCommand
      *
      * Checks if queue assigned method exists and is callable
      *
-     * @param String $channelAlias  Queue alias
+     * @param String $channelAlias Queue alias
      * @param String $channelMethod Queue method
      *
      * @return SubscriberCommand self Object
@@ -52,7 +52,7 @@ abstract class SubscriberCommand extends AbstractRSQueueCommand
     /**
      * Execute code.
      *
-     * @param InputInterface  $input  An InputInterface instance
+     * @param InputInterface $input An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
      * @throws InvalidAliasException If any alias is not defined
@@ -80,26 +80,42 @@ abstract class SubscriberCommand extends AbstractRSQueueCommand
         $this
             ->getContainer()
             ->get('rs_queue.redis')
-            ->subscribe($channels, function ($redis, $channel, $payloadSerialized) use ($methods, $resolver, $serializer, $eventDispatcher, $input, $output) {
+            ->subscribe(
+                $channels,
+                function ($redis, $channel, $payloadSerialized) use (
+                    $methods,
+                    $resolver,
+                    $serializer,
+                    $eventDispatcher,
+                    $input,
+                    $output
+                ) {
 
-                $channelAlias = $resolver->getQueueAlias($channel);
-                $method = $methods[$channelAlias];
-                $payload = $serializer->revert($payloadSerialized);
+                    $channelAlias = $resolver->getQueueAlias($channel);
+                    $method = $methods[$channelAlias];
+                    $payload = $serializer->revert($payloadSerialized);
 
-                /**
-                 * Dispatching subscriber event...
-                 */
-                $subscriberEvent = new RSQueueSubscriberEvent($payload, $payloadSerialized, $channelAlias, $channel, $redis);
-                $eventDispatcher->dispatch(RSQueueEvents::RSQUEUE_SUBSCRIBER, $subscriberEvent);
+                    /**
+                     * Dispatching subscriber event...
+                     */
+                    $subscriberEvent = new RSQueueSubscriberEvent(
+                        $payload,
+                        $payloadSerialized,
+                        $channelAlias,
+                        $channel,
+                        $redis
+                    );
+                    $eventDispatcher->dispatch(RSQueueEvents::RSQUEUE_SUBSCRIBER, $subscriberEvent);
 
-                /**
-                 * All custom methods must have these parameters
-                 *
-                 * InputInterface  $input   An InputInterface instance
-                 * OutputInterface $output  An OutputInterface instance
-                 * Mixed           $payload Payload
-                 */
-                $this->$method($input, $output, $payload);
-            });
+                    /**
+                     * All custom methods must have these parameters
+                     *
+                     * InputInterface  $input   An InputInterface instance
+                     * OutputInterface $output  An OutputInterface instance
+                     * Mixed           $payload Payload
+                     */
+                    $this->$method($input, $output, $payload);
+                }
+            );
     }
 }
